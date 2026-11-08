@@ -1,8 +1,8 @@
 #!/bin/sh
 # 1. Waits until no other n8n container uses the data folder (lock file), so two containers never share
-#    the SQLite database. RunCloud/Swarm starts the new container before stopping the old one; the
-#    stack's readiness health check must be OFF, otherwise the new container is never marked running
-#    and the old one is never stopped.
+#    the SQLite database. RunCloud/Swarm starts the new container before stopping the old one and
+#    waits for the new one's readiness check; while waiting for the lock, a placeholder answers
+#    that check on port 5678 so the old container gets stopped.
 # 2. Restores a backup before n8n starts: put a tar.gz of the n8n data folder at
 #    /home/node/.n8n/restore.tgz and restart the container. The current database and key are moved to
 #    .pre-restore/<timestamp>/, the archive is deleted afterwards (it contains the encryption key and
@@ -14,7 +14,13 @@ LOCK="$DATA/.instance.lock"
 exec 9>>"$LOCK"
 if ! flock -n 9; then
   echo "lock: another n8n container still uses $DATA, waiting for it to stop"
+  # Swarm (start-first) only stops the old container once this one passes its readiness check
+  # (a TCP check on port 5678). Answer that check with a placeholder until the lock is free.
+  node -e "require('net').createServer(s => s.destroy()).listen(5678)" &
+  PLACEHOLDER=$!
   flock 9
+  kill "$PLACEHOLDER" 2>/dev/null || true
+  wait "$PLACEHOLDER" 2>/dev/null || true
 fi
 echo "lock: acquired"
 
