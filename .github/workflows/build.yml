@@ -41,4 +41,4 @@ jobs:
       - name: Check ffmpeg and n8n on arm64
         run: |
           docker run --rm --platform linux/arm64 --entrypoint sh ghcr.io/${{ github.repository }}:${{ env.N8N_VERSION }} \
-            -c 'ffmpeg -version | head -1; n8n --version; which ssh curl'
+            -c 'ffmpeg -version | head -1; n8n --version; which ssh ssh-keygen curl'

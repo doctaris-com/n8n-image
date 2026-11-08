@@ -7,7 +7,7 @@ USER root
 # The n8n image ships without apk; borrow it from Alpine to install packages.
 COPY --from=alpine:3.24 /sbin/apk /sbin/apk
 COPY --from=alpine:3.24 /usr/lib/libapk.so* /usr/lib/
-RUN apk add --no-cache ffmpeg openssh-client curl \
+RUN apk add --no-cache ffmpeg openssh-client openssh-keygen curl \
  && ffmpeg -version | head -1
 
 COPY restore-entrypoint.sh /restore-entrypoint.sh
