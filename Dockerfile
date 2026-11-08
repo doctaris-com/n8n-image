@@ -1,7 +1,7 @@
 # n8n for doctaris.com: official n8n image plus ffmpeg (Bunny reel workflows),
 # ssh/curl (fetching a backup for restore) and a restore step before n8n starts.
 ARG N8N_VERSION=2.46.6
-FROM docker.n8n.io/n8nio/n8n:${N8N_VERSION}
+FROM n8nio/n8n:${N8N_VERSION}
 
 USER root
 # The n8n image ships without apk; borrow it from Alpine to install packages.
