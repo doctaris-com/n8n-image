@@ -15,8 +15,9 @@ exec 9>>"$LOCK"
 if ! flock -n 9; then
   echo "lock: another n8n container still uses $DATA, waiting for it to stop"
   # Swarm (start-first) only stops the old container once this one passes its readiness check
-  # (a TCP check on port 5678). Answer that check with a placeholder until the lock is free.
-  node -e "require('net').createServer(s => s.destroy()).listen(5678)" &
+  # (RunCloud's check falls back to an HTTP request on port 5678). Answer it with a placeholder
+  # HTTP 200 until the lock is free.
+  node -e "require('http').createServer((q, r) => { r.writeHead(200, {'Content-Type': 'text/plain', 'Connection': 'close'}); r.end('n8n is starting\n'); }).listen(5678)" &
   PLACEHOLDER=$!
   flock 9
   kill "$PLACEHOLDER" 2>/dev/null || true
