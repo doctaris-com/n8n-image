@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       n8n_version:
-        description: "n8n version (e.g. 2.46.6)"
+        description: "n8n version (e.g. 2.47.7)"
         required: true
-        default: "2.46.6"
+        default: "2.47.7"
   push:
     branches: [main]
 
@@ -15,7 +15,7 @@ permissions:
   packages: write
 
 env:
-  N8N_VERSION: ${{ github.event.inputs.n8n_version || '2.46.6' }}
+  N8N_VERSION: ${{ github.event.inputs.n8n_version || '2.47.7' }}
 
 jobs:
   build:
